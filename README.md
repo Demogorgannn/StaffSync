@@ -1,303 +1,287 @@
-# StaffSync – Modern Human Resource Management Solution (MERN)
+# StaffSync — Workforce Management Platform
 
-> A production-grade, full-stack Human Resource Management System (HRMS) built for enterprise workforce coordination, role-gated administration, automated attendance tracking, leave approval workflows, employee upskilling programs, and real-time operational analytics.
+> **Project documentation prepared by Mohammad Farhan Qureshi**  
+> StaffSync is a full-stack Human Resource Management System designed to bring employee records, attendance, leave requests, learning activities, announcements, and workforce reporting into one web application.
 
----
+## Overview
 
-## 🌟 Executive Summary
+StaffSync provides separate workspaces for HR administrators, department managers, and employees. The application uses the MERN stack, with React and Vite powering the client and Node.js/Express providing the API. MongoDB stores application data, while Redux Toolkit, Tailwind CSS, and Recharts support the user interface and reporting experience.
 
-**StaffSync** streamlines employee operations across three dedicated roles: **HR / Administrator**, **Department Manager**, and **Staff Employee**. Engineered using the **MERN** stack (MongoDB, Express.js, React.js with Vite, Node.js), Redux Toolkit, and Tailwind CSS, StaffSync delivers a modern SaaS user experience paired with robust server-side security, duplicate punch prevention, and automated leave balance deductions.
+The system includes role-aware access, attendance validation, leave approval workflows, employee training tools, and operational dashboards.
 
----
+## Demo Login Details
 
-## 🔑 Demo Evaluation Accounts
+The login page provides quick-login options for reviewing the main user roles.
 
-StaffSync includes preloaded demo credentials and **1-click quick-login buttons** on the login screen for rapid evaluator inspection:
+| Account type | Email | Password | Typical tasks |
+|---|---|---|---|
+| HR / Administrator | `hr@staffsync.demo` | `Demo@12345` | Manage employees and departments, publish notices, review organization metrics |
+| Department Manager | `manager@staffsync.demo` | `Demo@12345` | Monitor team attendance, handle leave requests, assign training |
+| Employee | `employee@staffsync.demo` | `Demo@12345` | Record attendance, apply for leave, view notices, update training progress |
 
-| Role | Email Address | Password | Primary Responsibilities |
-| :--- | :--- | :--- | :--- |
-| **HR / Administrator** | `hr@staffsync.demo` | `Demo@12345` | Org-wide dashboard, employee onboarding, departments, notices, analytics |
-| **Department Manager** | `manager@staffsync.demo` | `Demo@12345` | Team roster supervision, leave approval/rejection, employee training assignments |
-| **Staff Member** | `employee@staffsync.demo` | `Demo@12345` | Daily digital punch in/out, leave applications, course progress, announcements |
+> These are demonstration credentials. Replace demo credentials and secrets before using the application in a real environment.
 
----
+## Technology Used
 
-## 🛠️ Technology Stack
+### Client application
+- **React 18 + Vite** — component-based frontend and development/build tooling
+- **React Router DOM v6** — page navigation
+- **Redux Toolkit / React-Redux** — shared application state
+- **Tailwind CSS, PostCSS, Autoprefixer** — styling
+- **Lucide React** — interface icons
+- **Recharts** — charts for workforce statistics
+- **Axios** — HTTP requests with JWT interceptors
 
-### Frontend
-- **Framework:** React 18 with Vite
-- **Routing:** React Router DOM v6
-- **Global State Management:** Redux Toolkit & React-Redux
-- **Styling & UI:** Tailwind CSS, PostCSS, Autoprefixer
-- **Icons:** Lucide React
-- **Data Visualization:** Recharts (Area, Bar, and Pie Charts)
-- **HTTP Client:** Axios with JWT request/response interceptors
+### Server application
+- **Node.js** — JavaScript runtime
+- **Express.js 4** — REST API framework
+- **MongoDB with Mongoose 8** — persistent data storage and object modelling
+- **mongodb-memory-server** — optional in-memory database for local demonstration
+- **JWT** — session authentication
+- **bcryptjs** — password hashing
+- **CORS and express-validator** — request access configuration and input validation
+- **Morgan** — HTTP request logging
 
-### Backend
-- **Runtime:** Node.js (v20+ LTS recommended)
-- **Framework:** Express.js 4 (RESTful API architecture)
-- **Database Engine:** MongoDB Atlas / Local MongoDB with Mongoose 8 ODM
-- **In-Memory Fallback:** `mongodb-memory-server` (Zero-config instant local execution)
-- **Authentication & Security:** JSON Web Tokens (JWT), bcryptjs password hashing, CORS, express-validator
-- **Logging:** Morgan
+### Quality and deployment tools
+- **Jest and Supertest** — API integration testing
+- **Vite/Rollup** — optimized frontend build
+- **Vercel** — frontend hosting
+- **Render** — backend hosting
+- **MongoDB Atlas** — managed database hosting
 
-### Testing & DevOps
-- **Automated Testing:** Jest & Supertest
-- **Production Bundle:** Vite Rollup code splitting & chunk optimization
-- **Frontend Hosting:** Vercel (SPA routing rewrite enabled)
-- **Backend Hosting:** Render
-- **Database Hosting:** MongoDB Atlas
+## Main Features
 
----
+### 1. Role-specific dashboards
+- **HR dashboard (`/dashboard/hr`)** displays workforce totals, attendance summaries, pending leave requests, recent attendance trends, department headcounts, and shortcuts to common tasks.
+- **Manager dashboard (`/dashboard/manager`)** provides team information, daily attendance status, leave reviews, and training completion details.
+- **Employee dashboard (`/dashboard/employee`)** gives employees access to their attendance actions, available leave balances, company notices, and assigned courses.
 
-## 🚀 Key Functional Modules
+### 2. Attendance tracking (`/attendance`)
+- Employees can check in and check out for the workday.
+- The interface displays the current shift state.
+- Server-side checks and a compound unique index on employee and date help prevent duplicate daily check-ins.
+- Checkout calculates the recorded working duration; shifts shorter than four hours are marked as half-days.
+- Attendance records can be viewed at personal, team, and organization levels according to access permissions.
 
-### 1. Role-Based Workspaces
-- **HR / Admin Workspace (`/dashboard/hr`):** Total workforce counts, turnout rates, pending leave counter, 7-day attendance trend area chart, department headcount breakdown, and administrative shortcuts.
-- **Manager Workspace (`/dashboard/manager`):** Assigned direct reports, daily team turnout, pending approval queues with modal rejection reason requirements, and upskilling completion tracking.
-- **Employee Workspace (`/dashboard/employee`):** Digital attendance station, remaining leave balances (Annual, Sick, Casual), company announcements stream, and assigned training modules.
+### 3. Leave requests (`/leaves`)
+- Employees can request Annual, Sick, Casual, Maternity/Paternity, or Unpaid leave.
+- Each request includes a date range and a reason.
+- The server checks entitlement and prevents overlapping requests for the same employee.
+- Approved paid leave is deducted from the employee's available balance.
+- Managers and HR can approve or reject requests; a rejection requires a reason and can trigger an in-app notification.
 
-### 2. Digital Attendance Management (`/attendance`)
-- **Daily Check-In & Check-Out:** Live status indicators ("On Shift", "Shift Finished").
-- **Server-Side Validation:** Strictly prevents duplicate check-ins on the same calendar day via compound unique indices (`employee + date`).
-- **Duration Calculation:** Automatically computes work hours upon checkout; flags shifts under 4 hours as "Half-Day".
-- **Multi-Level Visibility:** Personal monthly logs, Team manager rosters, and HR organization-wide registry.
+### 4. Employee directory and profiles (`/employees`, `/profile`)
+- Search and filter employee records by name, employee ID, role/designation, department, and status.
+- HR can register staff and assign relevant organizational details.
+- HR can activate or deactivate employee accounts.
+- Employees can edit supported profile information, including phone number, avatar URL, and home address.
 
-### 3. Leave Management & Approval Workflows (`/leaves`)
-- **Employee Applications:** Select leave type (Annual, Sick, Casual, Maternity/Paternity, Unpaid), start and end dates, and justification.
-- **Balance Auto-Deductions:** Verifies available entitlement before submission; automatically deducts balance upon manager or HR approval.
-- **Conflict Prevention:** Server-side checks prevent overlapping leaves for the same employee.
-- **Manager Review Queue:** Approve with one click or reject with required feedback reasons dispatched via in-app notifications.
+### 5. Training and development (`/training`)
+- Courses are grouped into Technical, Compliance, Leadership, and Soft Skills categories.
+- Course entries can include links to learning materials, videos, or external resources.
+- HR and managers can assign courses to multiple employees.
+- Employees can update their completion percentage, mark courses complete, and submit feedback.
 
-### 4. Employee Directory & Profile Hub (`/employees`, `/profile`)
-- **Search & Filtering:** Real-time search by name, employee ID, designation, department, and employment status.
-- **HR Onboarding Modal:** Register new employees with role, department, manager, and contact details.
-- **Account Status Toggles:** Deactivate or reactivate employees with one click.
-- **Self-Service Profile:** Edit personal phone, avatar URL, and home address.
+### 6. Announcements (`/announcements`)
+- Notices can cover company news, holidays, policy changes, events, or urgent updates.
+- Important announcements can be pinned and labelled by priority.
+- Publishing a notice can send in-app notifications to active team members.
 
-### 5. Training & Skill Development Hub (`/training`)
-- **Course Catalog:** Categorized courses (Technical, Compliance, Leadership, Soft Skills).
-- **Curriculum Resource Links:** Link documentation, videos, and external courses.
-- **Employee Enrollment:** Managers and HR can batch-assign employees.
-- **Interactive Progress Slider:** Employees record percentage progress, mark completion, and provide feedback.
+### 7. Reports and analytics (`/reports`)
+- Charts summarize attendance patterns, department distribution, and leave information.
+- Management can export a CSV report for review and record-keeping.
+- The generated report filename is `staffsync-hrms-report.csv`.
 
-### 6. Announcements & Broadcast Notices (`/announcements`)
-- **Categorized Bulletins:** Company News, Holiday Notices, Policy Updates, Events, and Urgent Bulletins.
-- **Priority & Pinned Badges:** Pin critical notices to the top of the feed.
-- **Automatic Notifications:** Dispatches in-app notifications to active team members upon publication.
+## Repository Layout
 
-### 7. Reports & Operational Intelligence (`/reports`)
-- **Visual Analytics:** Interactive Recharts showing presence trends, department ratios, and leave statuses.
-- **One-Click CSV Export:** Generates downloadable `staffsync-hrms-report.csv` for management presentations and compliance audits.
-
----
-
-## 📁 Project Folder Structure
-
-```
+```text
 staffsync/
-├── client/                      # React Frontend (Vite)
+├── client/                         # React/Vite frontend
 │   ├── public/
 │   ├── src/
-│   │   ├── assets/              # Static media assets
-│   │   ├── components/          # Reusable UI (Navbar, Sidebar, Modal, Badge, StatCard)
-│   │   ├── layouts/             # DashboardLayout with responsive drawer
-│   │   ├── pages/               # Dashboards, Directory, Leaves, Attendance, Training, Reports
-│   │   ├── routes/              # ProtectedRoute role guards
-│   │   ├── services/            # Axios API instance with JWT interceptors
-│   │   ├── store/               # Redux Toolkit (authSlice, notificationSlice)
-│   │   ├── App.jsx              # Application router
-│   │   ├── index.css            # Tailwind directives & sleek scrollbar
-│   │   └── main.jsx             # React DOM root
+│   │   ├── assets/                 # Static assets
+│   │   ├── components/             # Shared interface components
+│   │   ├── layouts/                # Dashboard shell and navigation
+│   │   ├── pages/                  # Dashboard and feature pages
+│   │   ├── routes/                 # Protected routes and role checks
+│   │   ├── services/               # Axios API setup
+│   │   ├── store/                  # Redux state slices
+│   │   ├── App.jsx                 # Application routes
+│   │   ├── index.css               # Global styles
+│   │   └── main.jsx                # React entry point
 │   ├── index.html
 │   ├── package.json
 │   ├── tailwind.config.js
-│   ├── vercel.json              # SPA routing fallback for Vercel
-│   └── vite.config.js           # Proxy configuration & Rollup chunking
-│
-├── server/                      # Express Backend API
-│   ├── config/                  # Database connection (MongoDB Atlas + In-Memory Fallback)
-│   ├── controllers/             # Auth, Employee, Department, Attendance, Leave, Training, Analytics
-│   ├── middleware/              # JWT protect, role authorize, centralized error handler
-│   ├── models/                  # Mongoose models (User, Employee, Department, Attendance, Leave, Training, Announcement, Notification)
-│   ├── routes/                  # Express REST route endpoints
-│   ├── scripts/                 # Realistic database seeder script
-│   ├── services/                # Notification dispatch helper
-│   ├── tests/                   # Automated Jest & Supertest integration suite
-│   ├── validators/              # express-validator request schemas
+│   ├── vercel.json                 # Vercel SPA fallback rules
+│   └── vite.config.js
+├── server/                         # Express API
+│   ├── config/                     # Database setup
+│   ├── controllers/                # Request handlers
+│   ├── middleware/                 # Authentication and error handling
+│   ├── models/                     # Mongoose schemas
+│   ├── routes/                     # API route definitions
+│   ├── scripts/                    # Database seed utilities
+│   ├── services/                   # Notification helpers
+│   ├── tests/                      # Jest/Supertest tests
+│   ├── validators/                 # Request validation rules
 │   ├── .env.example
 │   ├── package.json
-│   └── server.js                # Server entry point & health check
-│
-├── render.yaml                  # Render Infrastructure Blueprint
+│   └── server.js                   # API entry point and health route
+├── render.yaml                     # Render deployment configuration
 ├── .gitignore
 ├── .env.example
 └── README.md
 ```
 
----
+## Run the Project on Your Computer
 
-## ⚡ Quick Start: Running Locally
+### Requirements
+- Node.js v18 or newer (Node.js v20+ LTS is recommended)
+- npm v9 or newer
 
-### Prerequisites
-- **Node.js:** v18.x or v20+ LTS
-- **npm:** v9+
+### Step 1 — Get the source code
 
-### 1. Clone & Enter Project
 ```bash
 git clone https://github.com/en24cs3010063-blip/StaffSync.git
 cd StaffSync
 ```
 
-### 2. Setup Server
+### Step 2 — Install and start the API
+
 ```bash
 cd server
 npm install
 cp .env.example .env
 ```
-*(Note: If `MONGO_URI` is left blank in `.env`, the server automatically initializes an in-memory MongoDB database and seeds demo data—requiring zero local database configuration!)*
 
-Run automated tests:
+Configure the environment variables in `.env` if needed. If `MONGO_URI` is left empty, the project is configured to use an in-memory MongoDB instance and seed demonstration data, so a separate local database may not be required for a quick demo.
+
+Run the backend tests:
+
 ```bash
 npm test
 ```
 
-Start the backend:
+Launch the server in development mode:
+
 ```bash
 npm run dev
-# Server running at http://localhost:5000
 ```
 
-### 3. Setup Client
-Open a second terminal window:
+The API is expected to run at `http://localhost:5000`.
+
+### Step 3 — Install and launch the frontend
+
+Open a second terminal from the project directory:
+
 ```bash
 cd client
 npm install
 npm run dev
-# Vite client running at http://localhost:5173
 ```
 
-Navigate to `http://localhost:5173` in your browser and click any of the **1-Click Demo Login** buttons!
+Vite normally serves the frontend at `http://localhost:5173`. Open that address in a browser and select one of the demo login options.
 
----
+## API Quick Reference
 
-## 🌐 API Endpoint Reference
+| Method | Route | Access | Purpose |
+|---|---|---|---|
+| `GET` | `/api/health` | Public | Check server health and uptime |
+| `POST` | `/api/auth/login` | Public | Sign in and receive a JWT |
+| `GET` | `/api/auth/me` | Signed in | Get the current account profile |
+| `PUT` | `/api/auth/profile` | Signed in | Change profile details |
+| `PUT` | `/api/auth/change-password` | Signed in | Change the account password |
+| `GET` | `/api/employees` | Signed in | Search the employee directory |
+| `POST` | `/api/employees` | HR only | Add an employee |
+| `PATCH` | `/api/employees/:id/status` | HR only | Change employee account status |
+| `POST` | `/api/attendance/check-in` | Signed in | Record a check-in |
+| `POST` | `/api/attendance/check-out` | Signed in | Record a check-out |
+| `GET` | `/api/attendance/today` | Signed in | View today's shift state |
+| `GET` | `/api/attendance/my-history` | Signed in | View personal attendance history |
+| `GET` | `/api/attendance/team` | Manager / HR | Review team attendance |
+| `GET` | `/api/attendance/organization` | HR only | View organization-wide attendance |
+| `POST` | `/api/leaves` | Signed in | Submit a leave request |
+| `GET` | `/api/leaves/my-leaves` | Signed in | View personal leave records and balances |
+| `GET` | `/api/leaves` | Manager / HR | Retrieve requests awaiting review |
+| `PATCH` | `/api/leaves/:id/review` | Manager / HR | Approve or reject a request |
+| `GET` | `/api/announcements` | Signed in | Read published announcements |
+| `POST` | `/api/announcements` | HR only | Publish a company announcement |
+| `GET` | `/api/trainings` | Signed in | Browse available training |
+| `POST` | `/api/trainings` | Manager / HR | Create a training item |
+| `POST` | `/api/trainings/:id/assign` | Manager / HR | Assign training to employees |
+| `PATCH` | `/api/trainings/:id/progress` | Signed in | Update course progress |
+| `GET` | `/api/analytics/admin` | HR only | Retrieve HR dashboard metrics |
+| `GET` | `/api/analytics/manager` | Manager / HR | Retrieve team metrics |
+| `GET` | `/api/analytics/employee` | Signed in | Retrieve personal statistics |
+| `GET` | `/api/notifications` | Signed in | List in-app notifications |
+| `PATCH` | `/api/notifications/mark-all-read` | Signed in | Mark notifications as read |
 
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/health` | Public | System status and uptime check |
-| `POST` | `/api/auth/login` | Public | Authenticate user and issue JWT |
-| `GET` | `/api/auth/me` | Authenticated | Retrieve current session profile |
-| `PUT` | `/api/auth/profile` | Authenticated | Update personal profile details |
-| `PUT` | `/api/auth/change-password` | Authenticated | Update account password |
-| `GET` | `/api/employees` | Authenticated | Search & filter employee directory |
-| `POST` | `/api/employees` | HR Only | Onboard a new employee |
-| `PATCH`| `/api/employees/:id/status` | HR Only | Toggle active/deactivated status |
-| `POST` | `/api/attendance/check-in` | Authenticated | Record daily clock in |
-| `POST` | `/api/attendance/check-out` | Authenticated | Record daily clock out |
-| `GET` | `/api/attendance/today` | Authenticated | Get current shift status |
-| `GET` | `/api/attendance/my-history` | Authenticated | Get personal attendance records |
-| `GET` | `/api/attendance/team` | Manager / HR | Get team presence roster |
-| `GET` | `/api/attendance/organization` | HR Only | Organization-wide daily attendance |
-| `POST` | `/api/leaves` | Authenticated | Submit leave request |
-| `GET` | `/api/leaves/my-leaves` | Authenticated | View personal leave history & balances |
-| `GET` | `/api/leaves` | Manager / HR | View leave approval requests |
-| `PATCH`| `/api/leaves/:id/review` | Manager / HR | Approve or reject leave request |
-| `GET` | `/api/announcements` | Authenticated | View published notices |
-| `POST` | `/api/announcements` | HR Only | Publish and broadcast notice |
-| `GET` | `/api/trainings` | Authenticated | View training catalog |
-| `POST` | `/api/trainings` | Manager / HR | Create training program |
-| `POST` | `/api/trainings/:id/assign` | Manager / HR | Batch-enroll employees in training |
-| `PATCH`| `/api/trainings/:id/progress` | Authenticated | Update course progress |
-| `GET` | `/api/analytics/admin` | HR Only | HR dashboard metric feeds |
-| `GET` | `/api/analytics/manager` | Manager / HR | Team performance metric feeds |
-| `GET` | `/api/analytics/employee` | Authenticated | Personal stats and shifts |
-| `GET` | `/api/notifications` | Authenticated | Fetch in-app notifications |
-| `PATCH`| `/api/notifications/mark-all-read` | Authenticated | Mark all notifications read |
+## Deployment Notes
 
----
+### Database — MongoDB Atlas
+1. Create a MongoDB Atlas cluster.
+2. Add a database user with an appropriate password.
+3. Configure network access for the deployment environment.
+4. Copy the connection URI and set it as `MONGO_URI`.
 
-## 🚢 Deployment Guide
+Example URI format:
 
-### 1. Database: MongoDB Atlas
-1. Create a free M0 cluster on [MongoDB Atlas](https://www.mongodb.com/atlas).
-2. Under **Database Access**, create a user (e.g. `staffsync_admin`).
-3. Under **Network Access**, whitelist `0.0.0.0/0` (allow access from anywhere).
-4. Copy your connection string: `mongodb+srv://<user>:<password>@cluster0.mongodb.net/staffsync?retryWrites=true&w=majority`.
-
-### 2. Backend: Render
-1. Create a new Web Service on [Render](https://render.com) linked to your GitHub repo.
-2. Root Directory: `server`.
-3. Build Command: `npm install`.
-4. Start Command: `npm start`.
-5. Environment Variables:
-   - `NODE_ENV`: `production`
-   - `MONGO_URI`: `<Your MongoDB Atlas URI>`
-   - `JWT_SECRET`: `<Secure Random String>`
-   - `CLIENT_URL`: `https://staffsync-mern-hrms.vercel.app` (Your Vercel URL)
-6. Once deployed, note your Render URL: e.g. `https://staffsync-server.onrender.com`.
-
-### 3. Frontend: Vercel
-1. Import your GitHub repository to [Vercel](https://vercel.com).
-2. Root Directory: `client`.
-3. Framework Preset: `Vite`.
-4. Environment Variables:
-   - `VITE_API_URL`: `https://staffsync-server.onrender.com` (Your Render backend URL)
-5. Deploy! Vercel's SPA rewrites (`vercel.json`) ensure all deep links (`/dashboard/hr`, `/attendance`, `/leaves`) resolve properly without 404s.
-
----
-
-## 🧪 Testing Results
-
-Backend integration test results executed via Jest & Supertest:
 ```text
-PASS tests/api.test.js
-  StaffSync HRMS Backend API Suite
-    1. Health Check & Public Routes
-      ✓ GET /api/health returns 200 and system status (4 ms)
-      ✓ GET /api/unknown-endpoint returns 404 (2 ms)
-    2. Authentication & Role Permissions
-      ✓ Fails login with invalid password (58 ms)
-      ✓ GET /api/auth/me returns current user profile with valid token (10 ms)
-      ✓ Employee cannot access HR-only routes like POST /api/departments (7 ms)
-      ✓ HR can create a new department (8 ms)
-    3. Attendance Management & Duplicate Prevention
-      ✓ Employee can check in successfully (10 ms)
-      ✓ Rejects duplicate check in on the same day (30 ms)
-      ✓ Employee can check out (10 ms)
-    4. Leave Application & Management
-      ✓ Rejects leave request when end date is before start date (10 ms)
-      ✓ Manager can view pending leave requests (12 ms)
-    5. Announcements & Analytics
-      ✓ HR can publish announcements (18 ms)
-      ✓ Admin analytics endpoint returns dashboard stats (37 ms)
-
-Test Suites: 1 passed, 1 total
-Tests:       13 passed, 13 total
-Snapshots:   0 total
-Time:        2.038 s
+mongodb+srv://<user>:<password>@cluster0.mongodb.net/staffsync?retryWrites=true&w=majority
 ```
 
-Frontend production build output:
+For production, restrict network access where possible instead of allowing unrestricted access.
+
+### Backend — Render
+1. Create a Render Web Service connected to the repository.
+2. Set the root directory to `server`.
+3. Set the build command to `npm install`.
+4. Set the start command to `npm start`.
+5. Add the environment variables below, using your actual deployment values.
+
 ```text
-✓ built in 1.67s
-dist/index.html                          1.65 kB │ gzip:   0.84 kB
-dist/assets/index-CLzmimAG.css          41.80 kB │ gzip:   7.26 kB
-dist/assets/icons-vendor-DJNhEIm-.js    22.16 kB │ gzip:   4.57 kB
-dist/assets/react-vendor-BnE1jKci.js   191.83 kB │ gzip:  63.79 kB
-dist/assets/index-UnjlgZqC.js          222.93 kB │ gzip:  51.49 kB
-dist/assets/charts-vendor-DrJRWGzG.js  394.51 kB │ gzip: 108.72 kB
+NODE_ENV=production
+MONGO_URI=<your MongoDB Atlas URI>
+JWT_SECRET=<a strong random secret>
+CLIENT_URL=<your deployed frontend URL>
 ```
 
+After deployment, copy the public backend URL for the frontend configuration.
+
+### Frontend — Vercel
+1. Import the repository into Vercel.
+2. Set the root directory to `client`.
+3. Choose the Vite framework preset.
+4. Set the following environment variable to your deployed API base URL:
+
+```text
+VITE_API_URL=<your deployed backend URL>
+```
+
+Deploy the frontend. The included `vercel.json` is intended to route client-side paths back through the single-page application.
+
+## Verification
+
+The supplied project README records the following results:
+
+- **Backend integration tests:** 1 test suite passed; 13 tests passed.
+- Coverage described includes health/public routes, authentication and role permissions, attendance duplicate prevention, leave validation/review, announcements, and analytics.
+- **Frontend production build:** reported as successful, with Vite/Rollup producing optimized assets.
+
+Run the tests and production build again in your own environment before relying on these results for a submission or deployment.
+
+## Possible Future Improvements
+
+- Connect biometric attendance devices through a real-time integration.
+- Add payroll processing, tax calculations, and downloadable payslips.
+- Send approval and announcement alerts through Slack or Microsoft Teams.
+- Introduce structured performance reviews and 360-degree feedback.
+
+## License
+
+The source README identifies the project as being released under the MIT License. Check that the repository contains the corresponding license file before redistributing the project.
+
 ---
 
-## 🔮 Future Enhancements
-- Integration with biometric hardware scanners via WebSockets.
-- Payroll generation with automated tax calculations and payslip PDF downloads.
-- Slack / Microsoft Teams webhook integrations for leave approvals and announcement alerts.
-- Performance review cycles (360-degree peer feedback).
-
----
-
-## 📄 License
-This project is open-source under the MIT License. Developed for major academic project submission and demonstration.
+**Prepared by:** Mohammad Farhan Qureshi  
+**Project:** StaffSync — Human Resource Management System
